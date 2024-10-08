@@ -42,9 +42,6 @@ namespace HideDogPlugin
         [Description("饥饿伤害值")]
         public float HungerDamage { get; set; } = 2f;
 
-        [Description("隐狗的护盾上限")]
-        public float MaxHumeShield { get; set; } = 0f;
-
         [Description("生成隐狗所需的最小玩家数")]
         public int MinPlayersForHiddenDog { get; set; } = 10;
     }
@@ -254,7 +251,6 @@ namespace HideDogPlugin
         private CoroutineHandle hintCoroutine;
         private Config config;
         private DateTime invisibilityStartTime;
-        private CoroutineHandle shieldResetCoroutine;
 
         /// <summary>
         /// 构造函数
@@ -267,7 +263,6 @@ namespace HideDogPlugin
             hungerCoroutine = Timing.RunCoroutine(HungerCheck());
             hintCoroutine = Timing.RunCoroutine(HintManager());
             invisibilityStartTime = DateTime.UtcNow;
-            shieldResetCoroutine = Timing.RunCoroutine(ShieldResetLoop());
         }
 
         /// <summary>
@@ -360,24 +355,12 @@ namespace HideDogPlugin
         }
 
         /// <summary>
-        /// 护盾重置循环协程
-        /// </summary>
-        private IEnumerator<float> ShieldResetLoop()
-        {
-            while (Player != null)
-            {
-                Player.HumeShield = 0f;
-                yield return Timing.WaitForSeconds(0.1f);
-            }
-        }
-
-        /// <summary>
         /// 禁用隐狗
         /// </summary>
         public void Disable()
         {
             DisableInvisibility();
-            Timing.KillCoroutines(hungerCoroutine, hintCoroutine, shieldResetCoroutine);
+            Timing.KillCoroutines(hungerCoroutine, hintCoroutine);
             Player = null;
         }
     }
